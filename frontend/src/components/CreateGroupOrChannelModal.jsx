@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { API_URL } from '../config';
 
 export default function CreateGroupOrChannelModal({ type, onClose, onCreated }) {
   const [name, setName] = useState('');
@@ -10,7 +9,7 @@ export default function CreateGroupOrChannelModal({ type, onClose, onCreated }) 
   const [admins, setAdmins] = useState([]);
 
   useEffect(() => {
-    axios.get(`${API_URL}/api/users`)
+    axios.get('http://5.199.169.195:5000/api/users')
       .then(res => setUsers(res.data));
   }, []);
 
@@ -24,7 +23,7 @@ export default function CreateGroupOrChannelModal({ type, onClose, onCreated }) 
 
   const handleCreate = async () => {
     await axios.post(
-      `${API_URL}/api/group`,
+      'http://5.199.169.195:5000/api/group',
       { name, type, description, members: selected, admins }
     );
     onCreated();
