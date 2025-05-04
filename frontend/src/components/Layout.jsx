@@ -1,6 +1,7 @@
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
+import ThemeToggle from './ThemeToggle';
 
 const Layout = () => {
   const { user, logout } = useAuth();
@@ -29,9 +30,10 @@ const Layout = () => {
                 <span className="text-gray-700 dark:text-gray-300 mr-4">
                   {user?.name}
                 </span>
+                <ThemeToggle />
                 <button
                   onClick={handleLogout}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 ml-4"
                 >
                   Logout
                 </button>

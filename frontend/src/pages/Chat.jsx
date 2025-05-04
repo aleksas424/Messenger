@@ -6,6 +6,7 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import CreateGroupOrChannelModal from '../components/CreateGroupOrChannelModal';
 import AddMemberModal from '../components/AddMemberModal';
+import { API_URL } from '../config';
 
 const typeIcon = {
   private: '💬',
@@ -42,7 +43,7 @@ const Chat = () => {
       return;
     }
 
-    socket.current = io('http://localhost:5000', {
+    socket.current = io(API_URL, {
       auth: {
         token
       },
@@ -104,10 +105,10 @@ const Chat = () => {
     // Fetch chats and join rooms when chats change
     const fetchChats = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/chat');
+        const response = await axios.get(`${API_URL}/api/chat`);
         const chatsWithLast = await Promise.all(response.data.map(async (chat) => {
           try {
-            const msgRes = await axios.get(`http://localhost:5000/api/chat/${chat.id}/messages`);
+            const msgRes = await axios.get(`${API_URL}/api/chat/${chat.id}/messages`);
             const lastMsg = msgRes.data[msgRes.data.length - 1];
             return { ...chat, lastMessage: lastMsg };
           } catch {
@@ -140,7 +141,7 @@ const Chat = () => {
     const fetchMessages = async () => {
       if (selectedChat) {
         try {
-          const response = await axios.get(`http://localhost:5000/api/chat/${selectedChat.id}/messages`);
+          const response = await axios.get(`${API_URL}/api/chat/${selectedChat.id}/messages`);
           setMessages(response.data);
         } catch (error) {
           toast.error('Failed to load messages');
@@ -153,7 +154,7 @@ const Chat = () => {
     const fetchMembers = async () => {
       if (selectedChat && selectedChat.type !== 'private') {
         try {
-          const response = await axios.get(`http://localhost:5000/api/group/${selectedChat.id}/members`, {
+          const response = await axios.get(`${API_URL}/api/group/${selectedChat.id}/members`, {
             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
           });
           setMembers(response.data);
@@ -175,7 +176,7 @@ const Chat = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/users', {
+        const response = await axios.get(`${API_URL}/api/users`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
         // Filter out current user and users we already have chats with
@@ -202,7 +203,7 @@ const Chat = () => {
     if (!newMessage.trim() || !selectedChat) return;
     try {
       await axios.post(
-        `http://localhost:5000/api/chat/${selectedChat.id}/messages`,
+        `${API_URL}/api/chat/${selectedChat.id}/messages`,
         { content: newMessage }
       );
       socket.current.emit('send-message', {
@@ -229,7 +230,7 @@ const Chat = () => {
 
   const handleCreatePrivateChat = async (userId) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/chat/private', 
+      const response = await axios.post(`${API_URL}/api/chat/private`, 
         { userId },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
@@ -257,7 +258,7 @@ const Chat = () => {
     if (!selectedChat) return;
     
     try {
-      await axios.delete(`http://localhost:5000/api/chat/${selectedChat.id}`, {
+      await axios.delete(`${API_URL}/api/chat/${selectedChat.id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       
@@ -503,13 +504,13 @@ const Chat = () => {
                     {myRole && member.id !== user.id && member.role !== 'owner' && (
                       <>
                         {myRole === 'owner' && member.role === 'admin' && (
-                          <button onClick={async () => { await axios.patch(`http://localhost:5000/api/group/${selectedChat.id}/members/${member.id}/role`, { role: 'member' }); window.location.reload(); }} className="text-xs text-yellow-600 ml-2">Pašalinti admin</button>
+                          <button onClick={async () => { await axios.patch(`${API_URL}/api/group/${selectedChat.id}/members/${member.id}/role`, { role: 'member' }); window.location.reload(); }} className="text-xs text-yellow-600 ml-2">Pašalinti admin</button>
                         )}
                         {(myRole === 'owner' || (myRole === 'admin' && member.role === 'member')) && member.role === 'member' && (
-                          <button onClick={async () => { await axios.patch(`http://localhost:5000/api/group/${selectedChat.id}/members/${member.id}/role`, { role: 'admin' }); window.location.reload(); }} className="text-xs text-green-600 ml-2">Padaryti admin</button>
+                          <button onClick={async () => { await axios.patch(`${API_URL}/api/group/${selectedChat.id}/members/${member.id}/role`, { role: 'admin' }); window.location.reload(); }} className="text-xs text-green-600 ml-2">Padaryti admin</button>
                         )}
                         {(myRole === 'owner' || (myRole === 'admin' && member.role === 'member')) && (
-                          <button onClick={async () => { await axios.delete(`http://localhost:5000/api/group/${selectedChat.id}/members/${member.id}`); window.location.reload(); }} className="text-xs text-red-600 ml-2">Pašalinti</button>
+                          <button onClick={async () => { await axios.delete(`${API_URL}/api/group/${selectedChat.id}/members/${member.id}`); window.location.reload(); }} className="text-xs text-red-600 ml-2">Pašalinti</button>
                         )}
                       </>
                     )}
@@ -529,13 +530,13 @@ const Chat = () => {
                     {myRole && member.id !== user.id && member.role !== 'owner' && (
                       <>
                         {myRole === 'owner' && member.role === 'admin' && (
-                          <button onClick={async () => { await axios.patch(`http://localhost:5000/api/group/${selectedChat.id}/members/${member.id}/role`, { role: 'member' }); window.location.reload(); }} className="text-xs text-yellow-600 ml-2">Pašalinti admin</button>
+                          <button onClick={async () => { await axios.patch(`${API_URL}/api/group/${selectedChat.id}/members/${member.id}/role`, { role: 'member' }); window.location.reload(); }} className="text-xs text-yellow-600 ml-2">Pašalinti admin</button>
                         )}
                         {(myRole === 'owner' || (myRole === 'admin' && member.role === 'member')) && member.role === 'member' && (
-                          <button onClick={async () => { await axios.patch(`http://localhost:5000/api/group/${selectedChat.id}/members/${member.id}/role`, { role: 'admin' }); window.location.reload(); }} className="text-xs text-green-600 ml-2">Padaryti admin</button>
+                          <button onClick={async () => { await axios.patch(`${API_URL}/api/group/${selectedChat.id}/members/${member.id}/role`, { role: 'admin' }); window.location.reload(); }} className="text-xs text-green-600 ml-2">Padaryti admin</button>
                         )}
                         {(myRole === 'owner' || (myRole === 'admin' && member.role === 'member')) && (
-                          <button onClick={async () => { await axios.delete(`http://localhost:5000/api/group/${selectedChat.id}/members/${member.id}`); window.location.reload(); }} className="text-xs text-red-600 ml-2">Pašalinti</button>
+                          <button onClick={async () => { await axios.delete(`${API_URL}/api/group/${selectedChat.id}/members/${member.id}`); window.location.reload(); }} className="text-xs text-red-600 ml-2">Pašalinti</button>
                         )}
                       </>
                     )}
@@ -547,7 +548,7 @@ const Chat = () => {
               <button
                 className="mt-4 w-full py-2 rounded bg-red-500 text-white font-medium hover:bg-red-600"
                 onClick={async () => {
-                  await axios.delete(`http://localhost:5000/api/group/${selectedChat.id}/leave`);
+                  await axios.delete(`${API_URL}/api/group/${selectedChat.id}/leave`);
                   window.location.reload();
                 }}
               >
@@ -558,7 +559,7 @@ const Chat = () => {
               <button
                 className="mt-2 w-full py-2 rounded bg-red-700 text-white font-medium hover:bg-red-800"
                 onClick={async () => {
-                  await axios.delete(`http://localhost:5000/api/group/${selectedChat.id}`);
+                  await axios.delete(`${API_URL}/api/group/${selectedChat.id}`);
                   window.location.reload();
                 }}
               >

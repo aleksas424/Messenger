@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import { API_URL } from '../config';
 
 const Profile = () => {
   const { user, logout } = useAuth();
@@ -18,7 +19,7 @@ const Profile = () => {
     setLoading(true);
 
     try {
-      await axios.put('http://localhost:5000/api/users/profile', {
+      await axios.put(`${API_URL}/api/users/profile`, {
         name,
         email
       });
@@ -41,7 +42,7 @@ const Profile = () => {
     setLoading(true);
 
     try {
-      await axios.put('http://localhost:5000/api/users/password', {
+      await axios.put(`${API_URL}/api/users/password`, {
         currentPassword,
         newPassword
       });
